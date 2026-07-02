@@ -1,0 +1,19 @@
+Task 4 (Bản đồ bộ nhớ & Phân tích Crash/Hard Fault): Khảo sát Bản đồ bộ nhớ & Debug Crash Lab
+4.2:
+        - BIKE_MODEL: Thuộc phân vùng .rodata vì đây là hằng số dữ liệu chỉ đọc.
+        - total_odometer: Thuộc phân vùng .bss vì đây là biến toàn cục chưa khởi tạo hoặc khởi tạo bằng 0.
+        - current_speed: Thuộc phân vùng stack  vì nó là biến cục bộ được khai báo bên trong hàm.
+4.3:
+        - Hệ điều hành sẽ phát hiện chương trình vi phạm vùng nhớ (truy cập vượt quá giới hạn vùng Stack được cấp phát). 
+        Chương trình sẽ lập tức bị đóng và xuất hiện lỗi Segmentation fault (core dumped) hoặc Stack Overflow.
+        - Khi Stack con trỏ (SP) vượt quá giới hạn của RAM, CPU sẽ kích hoạt một ngắt ngoại lệ phần cứng nghiêm trọng. 
+        Cụ thể, CPU sẽ nhảy thẳng vào hàm ngắt ngoại lệ HardFault_Handler (hoặc MemManage_Handler tùy cấu hình)
+        để treo hệ thống hoặc thực hiện lệnh reset an toàn.
+
+
+
+Task 5 (Linker, Linker Script & Phân bổ Bộ nhớ Vật lý): Tối ưu hóa dung lượng với Linker Script (Tự luận)
+        - Cách 1 sẽ giúp chương trình biên dịch thành công và nạp được xuống chip.
+        - Vì mảng được khởi tạo bằng 0, Linker sẽ xếp vào phân vùng .bss Phân vùng .bss không chiếm dung lượng trong bộ nhớ Flash (ROM)
+        - Còn cách 2 mảng được khởi tạo với các giá trị khác không Linker bắt buộc phải xếp nó vào phân vùng .data.
+        Phân vùng .data bắt buộc phải chiếm dung lượng thật trong bộ nhớ Flash để lưu trữ các giá trị khởi tạo ban đầu này
