@@ -1,0 +1,75 @@
+Task 1:
+1.1 Công dụng của các công cụ
+
+	- CMake
+	Là công cụ cấu hình dự án (Build System Generator). CMake đọc file CMakeLists.txt để tạo ra các file build phù hợp với hệ thống 	được chọn (ví dụ Ninja hoặc Makefile). Ngoài ra CMake còn thiết lập compiler, linker, include path và các tùy chọn biên dịch.
+
+	- Ninja
+	Là công cụ thực hiện quá trình build. Ninja đọc các file do CMake sinh ra rồi gọi compiler và linker để biên dịch dự án một cách 	nhanh chóng. Ninja hỗ trợ Incremental Build giúp chỉ biên dịch lại những file thay đổi.
+
+	- arm-none-eabi-gcc
+	Đây là bộ compiler dành cho vi điều khiển ARM Cortex-M. Nó biên dịch mã nguồn C thành file object (.o), sau đó linker tạo thành 	file thực thi (.elf), đồng thời có thể sinh ra file .bin hoặc .hex để nạp xuống vi điều khiển.
+
+	- STM32_Programmer_CLI
+	Là công cụ dòng lệnh của STMicroelectronics dùng để giao tiếp với chip STM32 thông qua ST-Link. Công cụ này dùng để nạp firmware 	vào Flash, xóa Flash, đọc bộ nhớ và reset vi điều khiển.
+
+
+1.2 Trình tự hoạt động của Toolchain
+
+	Bước 1:
+	Sửa mã nguồn C.
+	Bước 2:
+	CMake đọc CMakeLists.txt và tạo hệ thống build cho Ninja.
+	Bước 3:
+	Ninja thực hiện quá trình build bằng cách gọi arm-none-eabi-gcc.
+	Bước 4:
+	Compiler dịch từng file .c thành các file object (.o).
+	Bước 5:
+	Linker liên kết tất cả các file object cùng thư viện để tạo file thực thi (.elf), sau đó sinh ra file firmware (.bin).
+	Bước 6:
+	STM32_Programmer_CLI nạp file app_firmware.bin vào địa chỉ Flash 0x08000000 của vi điều khiển thông qua ST-Link và reset chip để 	chương trình bắt đầu chạy.
+
+
+Task 2:
+	2.1 Vai trò của Linker
+	Các file object (.o) chỉ chứa mã máy của từng module riêng lẻ và chưa được ghép lại thành một chương trình hoàn chỉnh. Trong các 	file này vẫn còn nhiều địa chỉ hàm, biến và dữ liệu chưa được xác định chính xác.
+
+	Linker có nhiệm vụ:
+	- Ghép tất cả các file object lại thành một chương trình.
+	- Liên kết các lời gọi hàm giữa các module.
+	- Bố trí chương trình vào đúng các vùng nhớ Flash và RAM theo Linker Script.
+	- Giải quyết các tham chiếu tới thư viện.
+	Kết quả cuối cùng là file .elf và file .bin có thể chạy trực tiếp trên vi điều khiển.
+
+	Khác biệt:
+	- File .o chỉ chứa mã máy của từng module riêng lẻ.
+	- File .bin là ảnh bộ nhớ hoàn chỉnh đã được sắp xếp đúng địa chỉ Flash nên có thể nạp trực tiếp xuống STM32.
+
+	2.2 Incremental Build của Ninja
+	Trong các dự án lớn có hàng trăm file nguồn, việc biên dịch toàn bộ mỗi lần chỉnh sửa sẽ mất rất nhiều thời gian.
+	Ninja sử dụng Incremental Build để chỉ biên dịch lại những file đã thay đổi, sau đó chỉ thực hiện lại bước liên kết nếu cần thiết. 	Ninja xác định file cần build lại bằng cách so sánh:
+
+	- thời gian chỉnh sửa (timestamp)
+	- quan hệ phụ thuộc (dependency)
+
+	Nếu một file .c hoặc file header liên quan được chỉnh sửa mới hơn file object tương ứng thì Ninja chỉ biên dịch lại đúng file đó 	thay vì toàn bộ dự án.
+
+	Điều này giúp giảm đáng kể thời gian build.
+
+
+Task 3
+
+3.1 
+	Trong Linker Script:
+	- VMA (Virtual Memory Address) là địa chỉ mà vùng .data sẽ tồn tại khi chương trình đang chạy. Trong STM32, vùng này nằm trong RAM 	vì các biến toàn cục có thể thay đổi giá trị.
+	- LMA (Load Memory Address) là địa chỉ lưu trữ dữ liệu ban đầu của vùng .data trong Flash. Khi firmware được nạp xuống chip, giá 	trị khởi tạo của các biến toàn cục sẽ được lưu trong Flash.
+
+	Startup code sẽ sao chép dữ liệu từ địa chỉ LMA (_sidata) sang địa chỉ VMA (_sdata).
+
+	Cần có cả hai địa chỉ vì:
+
+	- Flash lưu dữ liệu lâu dài sau khi mất điện.
+	- RAM cho phép đọc và ghi dữ liệu khi chương trình đang chạy.
+
+3.2 
+	Nếu Startup code không sao chép dữ liệu từ _sidata sang _sdata thì toàn bộ các biến toàn cục có giá trị khởi tạo sẽ không nhận 	được giá trị ban đầu.
