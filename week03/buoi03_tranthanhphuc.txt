@@ -73,3 +73,15 @@ Task 3
 
 3.2 
 	Nếu Startup code không sao chép dữ liệu từ _sidata sang _sdata thì toàn bộ các biến toàn cục có giá trị khởi tạo sẽ không nhận 	được giá trị ban đầu.
+
+
+Task 4
+
+	4.1 Câu lệnh cấu hình bằng CMake
+
+	cmake -B build -G Ninja
+
+
+	4.2 Câu lệnh Build bằng Ninja
+
+	ninja -C build
