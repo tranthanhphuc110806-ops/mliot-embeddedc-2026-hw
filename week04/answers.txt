@@ -1,0 +1,24 @@
+Thiết kế LED phản hồi cho Task 5 theo cách 2.
+https://www.youtube.com/watch?v=Ua2viXKjLXk
+
+
+Task 1:
+
+1.1: 
+	Pmos ở phía trên nối với nguồn 3.3V, Nmos ở phía dưới nối gnd.
+	Khi cấu hình chân ở mức logic 1 (3.3V):
+		- Mạch kích thích nội bộ (Gate driver) sẽ đưa điện áp điều khiển cực cổng (Gate) về mức thấp.
+		- Transistor PMOS đóng (ON - dẫn điện): Nối trực tiếp chân I/O vật lý với nguồn điện áp (3.3V). Lúc này chân GPIO 			đóng vai trò là nguồn cấp dòng (Source current) ra ngoài.
+		- Transistor NMOS ngắt (OFF - cách điện): Cắt đứt kết nối giữa chân I/O và GND để tránh bị ngắn mạch.
+	Khi cấu hình chân ở mức logic 0 (0V):
+		- Mạch kích thích nội bộ sẽ đưa điện áp điều khiển cực cổng lên mức cao.
+		- Transistor PMOS ngắt (OFF - cách điện): Cách ly chân I/O khỏi nguồn 3.3V
+		- Transistor NMOS đóng (ON - dẫn điện): Nối trực tiếp chân I/O xuống gnd. Lúc này chân GPIO đóng vai trò là ngõ hút dòng từ 		mạch ngoài xuống đất.
+1.2:
+	- Cần cấu hình một chân GPIO ở chế độ Input Pull-up khi kết nối vi điều khiển với các thiết bị ngoại vi hoạt động theo kiểu Active 	low
+	- Nếu một chân cấu hình là Input nhưng lại để ở trạng thái Floating (No Pull-up/Pull-down) và không kết nối vào đâu thì giá trị 	logic đọc được sẽ bị nhảy loạn xạ giữa 0 và 1 một cách ngẫu nhiên. Điều này làm hệ thống xử lý sai lệch hoàn toàn so với thực tế.
+
+
+Task2:
+	- Nhà sản xuất chip (ST) lại mặc định tắt toàn bộ Clock của ngoại vi khi vừa reset chip để tiết kiệm năng lượng. Khi dùng đến dùng 	ngoại vi nào thì bạn chỉ bật đúng Clock của ngoại vi đó, giữ cho chip luôn hoạt động ở mức tiết kiệm năng lượng tối ưu nhất.
+	- Nếu bạn cấu hình các thanh ghi chức năng của GPIO mà quên bật Clock cho Port đó thì sẽ các thao tác ghi, đọc dữ liệu... sẽ hoàn 	toàn vô dụng
