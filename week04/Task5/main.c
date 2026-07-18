@@ -20,23 +20,23 @@ void KEYPAD_2x2_Scan(void)
                 HAL_Delay(20); // chong doi
                 if (HAL_GPIO_ReadPin(GPIOA, COL_PINS[c]) == GPIO_PIN_RESET)
                 {
-                    if (r == 0 && c == 0)
+                    if (r == 0 && c == 0) 
                     {
-                        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+                        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);      // Dao trang thai hang 1 cot 1
                     }
                     else if (r == 0 && c == 1)
                     {
-                        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+                        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);      // Dao trang thai hang 1 cot 2
                     }
                     else if (r == 1 && c == 0)
                     {
-                        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_6);
+                        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_6);      // Dao trang thai hang 2 cot 1
                     }
                     else if (r == 1 && c == 1)
                     {
-                        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_7);
+                        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_7);      // Dao trang thai hang 2 cot 2
                     }
-                    while (HAL_GPIO_ReadPin(GPIOA, COL_PINS[c]) == GPIO_PIN_RESET)
+                    while (HAL_GPIO_ReadPin(GPIOA, COL_PINS[c]) == GPIO_PIN_RESET) 
                     {
                         // doi nha phim
                     }
